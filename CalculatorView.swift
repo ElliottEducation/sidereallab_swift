@@ -1,117 +1,100 @@
 import SwiftUI
 
 struct CalculatorView: View {
-    @StateObject private var viewModel = RotationViewModel()
-    
+    @ObservedObject var viewModel: RotationViewModel
+
     var body: some View {
-        NavigationView {
-            Form {
-                // 纬度输入
-                Section(header: Text("Input Latitude")) {
-                    HStack {
-                        Text("Latitude (°)")
-                        Spacer()
-                        TextField("Latitude", value: $viewModel.latitude, format: .number)
-                            .keyboardType(.decimalPad)
-                            .frame(width: 100)
-                    }
-                }
+        ScrollView {
+            VStack(spacing: 20) {
                 
-                // 时间输入 Start
-                Section(header: Text("Start Time")) {
-                    DatePicker("Date", selection: $viewModel.startTime, displayedComponents: .date)
-                    DatePicker("Time", selection: $viewModel.startTime, displayedComponents: .hourAndMinute)
-                    
-                    Stepper("Seconds: \(Calendar.current.component(.second, from: viewModel.startTime))", value: Binding(
-                        get: { Calendar.current.component(.second, from: viewModel.startTime) },
-                        set: { newVal in
-                            viewModel.startTime = Calendar.current.date(bySetting: .second, value: newVal, of: viewModel.startTime) ?? viewModel.startTime
-                        }
-                    ), in: 0...59)
+                // ✅ 顶部标题与下移 spacer
+                VStack(spacing: 8) {
+                    Spacer().frame(height: 24)
+
+                    Text("🌏 Sidereal Calculator")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.blue)
                 }
-                
-                // 时间输入 End
-                Section(header: Text("End Time")) {
-                    DatePicker("Date", selection: $viewModel.endTime, displayedComponents: .date)
-                    DatePicker("Time", selection: $viewModel.endTime, displayedComponents: .hourAndMinute)
-                    
-                    Stepper("Seconds: \(Calendar.current.component(.second, from: viewModel.endTime))", value: Binding(
-                        get: { Calendar.current.component(.second, from: viewModel.endTime) },
-                        set: { newVal in
-                            viewModel.endTime = Calendar.current.date(bySetting: .second, value: newVal, of: viewModel.endTime) ?? viewModel.endTime
-                        }
-                    ), in: 0...59)
+                .frame(maxWidth: .infinity)
+
+                // 纬度输入行
+                HStack {
+                    Text("Latitude (+ in N, − in S)")
+                        .font(.headline)
+                    Spacer()
+                    TextField("Latitude", value: $viewModel.latitude, format: .number)
+                        .keyboardType(.decimalPad)
+                        .frame(width: 100)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
                 }
-                
-                // 亮星 / 天体选择
-                Section(header: Text("Select Target (Optional)")) {
-                    Picker("Celestial Object", selection: $viewModel.selectedTarget) {
+                .padding(.horizontal)
+
+                // Celestial Picker
+                HStack {
+                    Text("Celestial Target")
+                        .font(.headline)
+                    Spacer()
+                    Picker("", selection: $viewModel.selectedTarget) {
                         Text("None").tag(nil as CelestialTarget?)
                         ForEach(celestialTargets, id: \.self) { target in
                             Text(target.name).tag(target as CelestialTarget?)
                         }
                     }
-                    .onChange(of: viewModel.selectedTarget) { _ in
-                        viewModel.applySelectedTarget()
-                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .frame(width: 180)
                 }
-                
-                // RA / Dec 输入区
-                Section(header: Text("RA/Dec Correction (Optional)")) {
-                    Toggle("Use RA/Dec instead of time", isOn: $viewModel.useRAInput)
-                    
-                    if viewModel.useRAInput {
-                        HStack {
-                            Text("RA at Time 1 (hr)")
-                            Spacer()
-                            TextField("RA1", value: $viewModel.ra1, format: .number)
-                                .keyboardType(.decimalPad)
-                                .frame(width: 100)
-                        }
-                        HStack {
-                            Text("RA at Time 2 (hr)")
-                            Spacer()
-                            TextField("RA2", value: $viewModel.ra2, format: .number)
-                                .keyboardType(.decimalPad)
-                                .frame(width: 100)
-                        }
-                        HStack {
-                            Text("Dec at Time 1 (°)")
-                            Spacer()
-                            TextField("Dec1", value: $viewModel.dec1, format: .number)
-                                .keyboardType(.decimalPad)
-                                .frame(width: 100)
-                        }
-                        HStack {
-                            Text("Dec at Time 2 (°)")
-                            Spacer()
-                            TextField("Dec2", value: $viewModel.dec2, format: .number)
-                                .keyboardType(.decimalPad)
-                                .frame(width: 100)
-                        }
+                .padding(.horizontal)
+
+                // Start & End Time sections
+                GroupBox(label: Text("Start Time")) {
+                    HStack(spacing: 12) {
+                        TextField("yyyy-mm-dd", text: $viewModel.startDateString)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 120)
+
+                        TimeInputView(hour: $viewModel.startHour, minute: $viewModel.startMinute, second: $viewModel.startSecond)
                     }
+                    .padding(.vertical, 6)
                 }
-                
-                // 结果显示
-                Section(header: Text("Results")) {
-                    HStack {
-                        Text("ΔT")
-                        Spacer()
-                        Text(viewModel.deltaTString)
+
+                GroupBox(label: Text("End Time")) {
+                    HStack(spacing: 12) {
+                        TextField("yyyy-mm-dd", text: $viewModel.endDateString)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 120)
+
+                        TimeInputView(hour: $viewModel.endHour, minute: $viewModel.endMinute, second: $viewModel.endSecond)
                     }
-                    HStack {
-                        Text("ω (rad/s)")
-                        Spacer()
-                        Text(viewModel.omegaString)
+                    .padding(.vertical, 6)
+                }
+
+                // Calculated parameters
+                GroupBox(label: Text("Calculated Parameters")) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("📍 Local Radius: \(String(format: "%.2f", viewModel.effectiveRadius / 1000)) km")
+
+                        HStack {
+                            Text("💨 Local Speed: \(viewModel.speedConverted) \(viewModel.selectedSpeedUnit.rawValue)")
+                            Spacer()
+                            Picker("", selection: $viewModel.selectedSpeedUnit) {
+                                ForEach(RotationViewModel.SpeedUnit.allCases) { unit in
+                                    Text(unit.rawValue).tag(unit)
+                                }
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                            .frame(width: 80)
+                        }
+
+                        Text("⏱ Angular Speed: \(viewModel.omegaScientificString) rad/s")
                     }
-                    HStack {
-                        Text("Speed (m/s)")
-                        Spacer()
-                        Text(viewModel.speedString)
-                    }
+                    .font(.system(size: 16, weight: .medium))
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
                 }
             }
-            .navigationTitle("Sidereal Calculator")
+            .padding()
         }
     }
 }

@@ -3,8 +3,8 @@ import Foundation
 struct CelestialTarget: Identifiable, Hashable {
     let id = UUID()
     let name: String
-    let ra: Double   // 单位：小时
-    let dec: Double  // 单位：度
+    let ra: Double   // RA in hours
+    let dec: Double  // Dec in degrees
 }
 
 let celestialTargets: [CelestialTarget] = [
@@ -17,5 +17,4 @@ let celestialTargets: [CelestialTarget] = [
     CelestialTarget(name: "M13 (Hercules Cluster)", ra: 16.42, dec: 36.46),
     CelestialTarget(name: "NGC 7000 (North America)", ra: 20.85, dec: 44.0)
 ]
-
 

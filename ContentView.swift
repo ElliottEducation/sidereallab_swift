@@ -1,26 +1,28 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var viewModel = RotationViewModel()
+
     var body: some View {
         TabView {
-            CalculatorView()
+            CalculatorView(viewModel: viewModel)
                 .tabItem {
                     Label("Calculator", systemImage: "function")
                 }
-            
-            ChartView()
+
+            ChartView(viewModel: viewModel)
                 .tabItem {
                     Label("Charts", systemImage: "chart.xyaxis.line")
                 }
-            
-            ExportView()
+
+            ExportView(viewModel: viewModel)
                 .tabItem {
                     Label("Export", systemImage: "square.and.arrow.up")
                 }
-            
+
             SettingsView()
                 .tabItem {
-                    Label("Settings", systemImage: "gearshape")
+                    Label("Settings", systemImage: "gear")
                 }
         }
     }

@@ -2,18 +2,38 @@ import SwiftUI
 
 struct SettingsView: View {
     var body: some View {
-        Form {
-            Section(header: Text("App Info")) {
-                Text("Version 1.0")
-                Text("Developed by Elliott")
-            }
+        NavigationView {
+            Form {
+                Section(header: Text("App Info")) {
+                    HStack {
+                        Text("Version")
+                        Spacer()
+                        Text("1.0")
+                            .foregroundColor(.gray)
+                    }
 
-            Section(header: Text("Links")) {
-                Link("Visit Website", destination: URL(string: "https://sidereallab.streamlit.app")!)
-                Link("GitHub Repo", destination: URL(string: "https://github.com/elliottcao/sidereallab")!)
+                    HStack {
+                        Text("Developer")
+                        Spacer()
+                        Text("Elliott")
+                            .foregroundColor(.gray)
+                    }
+                }
+
+                Section(header: Text("Help & Support")) {
+                    NavigationLink(destination: UserManualView()) {
+                        Label("User Manual", systemImage: "book")
+                    }
+
+                    Label {
+                        Link("Contact Developer", destination: URL(string: "mailto:elliotteducation956@gmail.com")!)
+                    } icon: {
+                        Image(systemName: "envelope")
+                    }
+                }
             }
+            .navigationTitle("Settings")
         }
-        .navigationTitle("Settings")
     }
 }
 

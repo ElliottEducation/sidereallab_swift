@@ -7,7 +7,7 @@ struct CalculatorView: View {
         ScrollView {
             VStack(spacing: 20) {
                 
-                // ✅ 顶部标题与下移 spacer
+                // ✅ heading moving down spacer
                 VStack(spacing: 8) {
                     Spacer().frame(height: 24)
 
@@ -19,7 +19,7 @@ struct CalculatorView: View {
                 }
                 .frame(maxWidth: .infinity)
 
-                // 纬度输入行
+                // latitude input
                 HStack {
                     Text("Latitude (+ in N, − in S)")
                         .font(.headline)

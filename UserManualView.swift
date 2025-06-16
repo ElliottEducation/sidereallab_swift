@@ -66,7 +66,7 @@ struct UserManualView: View {
                         .bold()
 
                     Text("For bug reports or feedback, contact the developer:")
-                    Link("elliotteducatio956@gmail.com", destination: URL(string: "mailto:elliotteducatio956@gmail.com")!)
+                    Link("elliotteducation956@gmail.com", destination: URL(string: "mailto:elliotteducation956@gmail.com")!)
                 }
             }
             .padding()

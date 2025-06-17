@@ -11,7 +11,7 @@ struct ChartView: View {
     @ObservedObject var viewModel: RotationViewModel
 
     private var data: [RotationChartDataPoint] {
-        // 使用更细的步进以便贴合用户输入的纬度（如33.80）
+        // Use finer increments to fit the latitude entered by the user (e.g. 33.80 in south for Sydney)
         stride(from: -90.0, through: 90.0, by: 0.1).map { lat in
             let speed = EarthRotationCalculator.siderealSpeed(latitude: lat, deltaT: viewModel.activeDeltaT)
             return RotationChartDataPoint(latitude: lat, speedMS: speed)
@@ -30,7 +30,7 @@ struct ChartView: View {
                     .padding(.leading)
 
                 Chart {
-                    // 主曲线
+                    // The main latitude vs speed curve
                     ForEach(data) { point in
                         LineMark(
                             x: .value("Latitude", point.latitude),
@@ -40,7 +40,7 @@ struct ChartView: View {
                         .foregroundStyle(.blue)
                     }
 
-                    // 高亮红点与注解
+                    // Red hightlight and comment
                     if let highlight = highlightedPoint {
                         PointMark(
                             x: .value("Latitude", highlight.latitude),
@@ -54,13 +54,13 @@ struct ChartView: View {
                                 .foregroundColor(.red)
                         }
                         .annotation(position: .bottom) {
-                            // ✅ 使用用户原始输入纬度以保证小数精度同步
+                            // Use user's latitude input to confirm and synchronize 
                             Text("\(viewModel.latitude.formattedWithExactDecimals(from: viewModel.latitude))°")
                                 .font(.caption2)
                                 .foregroundColor(.red)
                         }
 
-                        // 红色十字虚线
+                        // red dash lines
                         RuleMark(x: .value("Latitude", highlight.latitude))
                             .foregroundStyle(.red)
                             .lineStyle(StrokeStyle(lineWidth: 1, dash: [5]))

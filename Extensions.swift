@@ -7,12 +7,12 @@
 
 import Foundation
 
-/// 扩展 Double 类型，使其支持根据用户原始输入的小数位数进行动态格式化
+/// Extend the Double type to support dynamic formatting based on the number of decimal places originally entered by the user
 extension Double {
-    /// 根据传入的原始值 `original` 保留相同的小数位数
+    /// Keep the same number of decimal places as the original value `original` passed in
     ///
-    /// - Parameter original: 用户最初输入的数值，用于参考小数位数
-    /// - Returns: 保留相同小数位数后的字符串
+    /// - Parameter original: The value originally entered by the user, used to refer to the number of decimal places
+    /// - Returns: string with the same number of decimal places
     func formattedWithExactDecimals(from original: Double) -> String {
         let originalString = String(original)
         let decimals = originalString.split(separator: ".").last?.count ?? 2

@@ -8,7 +8,7 @@ struct ExportView: View {
 
     var body: some View {
         Form {
-            // Section with VStack (最稳定结构)
+            // Section with VStack (the latest stable)
             Section {
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {

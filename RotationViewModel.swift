@@ -23,7 +23,7 @@ class RotationViewModel: ObservableObject {
 
     @Published var useRAInput: Bool = false
 
-    // ✅ 单位切换
+    // unit switching
     enum SpeedUnit: String, CaseIterable, Identifiable {
         case mps = "m/s"
         case kmh = "km/h"
